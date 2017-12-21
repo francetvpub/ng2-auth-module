@@ -6,6 +6,20 @@
 /out-tsc
 /ts-node*
 /karma-*
+manifest.mf
+build.xml
+*.js
+!config/*
+!karma.conf.js
+!webpack.config.js
+*.map
+*.d.ts
+!make.js
+!examples/**/*.js
+coverage
+*.metadata.json
+*.ngsummary.json
+bundles
 
 # dependencies
 /node_modules
