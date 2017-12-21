@@ -8,6 +8,7 @@ import {CookieService} from 'ngx-cookie';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/publishLast';
 import 'rxjs/add/operator/publish';
 import * as moment from 'moment';
@@ -163,11 +164,18 @@ export class FtpAuthService {
     } else {
       this.refreshToken()
         .map(token => !!token && token.isValid(), () => false)
-        .subscribe((result) => this._isAuthenticated.next(result));
+        .subscribe(
+          (result) => this._isAuthenticated.next(result),
+          (error) => this._isAuthenticated.next(false)
+        );
     }
   }
 
   refreshToken(): Observable<OAuthToken> {
+    if (!this.token.refreshToken) {
+      return Observable.of(new OAuthToken());
+    }
+
     if (!this.refreshToken$[this.token.refreshToken]) {
       this.refreshToken$[this.token.refreshToken] = this.http.post(this.config.ApiBaseUrl + '/oauth', {
         'client_id': this.config.OpenIdClientId,
@@ -195,14 +203,14 @@ export class FtpAuthService {
   }
 
   getHeaders(additionalHeaders?: HttpHeaders): Observable<HttpHeaders> {
-    const headers = !!additionalHeaders ? additionalHeaders : new HttpHeaders();
+    let headers = !!additionalHeaders ? additionalHeaders : new HttpHeaders();
 
     if (!!this.token && this.token.isValid()) {
-      headers.set('Authorization', 'Bearer ' + this.token.accessToken);
+      headers = headers.append('Authorization', 'Bearer ' + this.token.accessToken);
     } else if (!!this.token) {
       return this.refreshToken()
         .map(token => {
-          headers.set('Authorization', 'Bearer ' + token.accessToken);
+          headers = headers.append('Authorization', 'Bearer ' + token.accessToken);
           return headers;
         }, () => {
           return headers;

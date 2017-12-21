@@ -4,8 +4,7 @@ import {ActivatedRoute, Params, Router} from '@angular/router';
 
 @Component({
   selector: 'app-ftp-auth-callback',
-  templateUrl: './callback.component.html',
-  styleUrls: ['./callback.component.scss']
+  template: ''
 })
 @Injectable()
 export class FtpCallbackComponent implements OnInit {

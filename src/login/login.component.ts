@@ -5,8 +5,20 @@ import {FtpAuthService} from '../auth.service';
 
 @Component({
   selector: 'app-ftp-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  template: `
+    <a mat-raised-button color="primary"
+       [href]="loginPage">
+      Connexion avec France Télévision Publicité
+    </a>
+  `,
+  styles: [`
+    :host {
+      display: flex;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+    }
+  `]
 })
 @Injectable()
 export class FtpLoginComponent implements OnInit {
