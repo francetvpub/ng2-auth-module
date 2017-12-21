@@ -1,7 +1,7 @@
 import {Inject, Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {Router} from '@angular/router';
-import {Http, RequestOptionsArgs, Headers} from '@angular/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {FtpAuthConfig} from './auth.config';
 import {FTP_AUTH_CONFIG} from './auth.config.provider';
 import {CookieService} from 'ngx-cookie';
@@ -11,12 +11,12 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/publishLast';
 import 'rxjs/add/operator/publish';
 import * as moment from 'moment';
-import {Subscriber} from 'rxjs/Subscriber';
-import {Identity} from './identity';
+import {Identity, JsonIdentity} from './identity';
 import {Subject} from 'rxjs/Subject';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import {Subscriber} from 'rxjs/Subscriber';
 
-interface JsonOAuthToken {
+export interface JsonOAuthToken {
   access_token: string;
   refresh_token: string;
   expires_in?: number;
@@ -42,15 +42,20 @@ export class OAuthToken {
   }
 
   extract(): JsonOAuthToken {
-    return {
+    const token = {
       access_token: this.accessToken,
-      refresh_token: this.refreshToken,
-      expires: this.expires ? this.expires.getTime() : null
+      refresh_token: this.refreshToken
     };
+
+    if (!!this.expires) {
+      token['expires'] = this.expires.getTime();
+    }
+
+    return token;
   }
 
   isValid(): boolean {
-    return new Date(new Date().getTime() + 300000) < this.expires;
+    return (!!this.expires && new Date(new Date().getTime() + 300000) < this.expires);
   }
 }
 
@@ -61,7 +66,7 @@ export class FtpAuthService {
 
   private refreshToken$: Observable<OAuthToken>[] = [];
 
-  protected _token: OAuthToken;
+  protected _token?: OAuthToken;
 
   protected _isAuthenticated: Subject<boolean>;
 
@@ -75,17 +80,18 @@ export class FtpAuthService {
       this._token = new OAuthToken(tokenData);
     }
 
+    if (!this._token) {
+      return new OAuthToken();
+    }
+
     return this._token;
   }
 
   set token(token: OAuthToken) {
-    if (!!token) {
-      this.cookieService.put('token', JSON.stringify(token.extract()), {
-        expires: moment().add(15, 'd').toDate()
-      });
-    } else {
-      this.cookieService.remove('token');
-    }
+    this.cookieService.put('token', JSON.stringify(token.extract()), {
+      expires: moment().add(15, 'd').toDate()
+    });
+
     this._token = token;
   }
 
@@ -107,7 +113,7 @@ export class FtpAuthService {
 
   constructor(
     @Inject(FTP_AUTH_CONFIG) config: FtpAuthConfig,
-    private http: Http,
+    private http: HttpClient,
     private router: Router,
     private cookieService: CookieService
   ) {
@@ -138,11 +144,11 @@ export class FtpAuthService {
 
     url += '?' + params.toString();
 
-    return this.http.post(url, {}).map(response => response.json())
-      .do((jsonResponse) => {
-        this.token = new OAuthToken(jsonResponse);
+    return this.http.post(url, {})
+      .do((jsonToken: JsonOAuthToken) => {
+        this.token = new OAuthToken(jsonToken);
         this.checkAuthentication();
-      });
+      }).map(result => !!result);
   }
 
   private checkAuthentication() {
@@ -169,8 +175,7 @@ export class FtpAuthService {
         'refresh_token': this.token.refreshToken,
         'grant_type': 'refresh_token'
       })
-        .map(response => response.json())
-        .map(jsonResponse => new OAuthToken(jsonResponse))
+        .map((jsonToken: JsonOAuthToken) => new OAuthToken(jsonToken))
         .do(token => this.token = token)
         .publishLast()
         .refCount();
@@ -178,17 +183,19 @@ export class FtpAuthService {
     return this.refreshToken$[this.token.refreshToken];
   }
 
-  getRequestOptionsArgs(additionalHeaders?: Headers): Observable<RequestOptionsArgs> {
+  getRequestOptionsArgs(additionalHeaders?: HttpHeaders): Observable<{headers?: HttpHeaders | {
+    [header: string]: string | string[];
+  }}> {
     return this.getHeaders(additionalHeaders)
-      .map((headers: Headers) => {
+      .map((headers: HttpHeaders) => {
         return {
           headers: headers
         };
       });
   }
 
-  getHeaders(additionalHeaders?: Headers): Observable<Headers> {
-    const headers = !!additionalHeaders ? additionalHeaders : new Headers();
+  getHeaders(additionalHeaders?: HttpHeaders): Observable<HttpHeaders> {
+    const headers = !!additionalHeaders ? additionalHeaders : new HttpHeaders();
 
     if (!!this.token && this.token.isValid()) {
       headers.set('Authorization', 'Bearer ' + this.token.accessToken);
@@ -197,7 +204,7 @@ export class FtpAuthService {
         .map(token => {
           headers.set('Authorization', 'Bearer ' + token.accessToken);
           return headers;
-        }, error => {
+        }, () => {
           return headers;
         });
     }
@@ -205,22 +212,22 @@ export class FtpAuthService {
     return Observable.of(headers);
   }
 
-  getIdentity(): Observable<Identity> {
+  getIdentity(): Observable<Identity>|Observable<null> {
     const url = this.config.ApiBaseUrl + '/oauth/userinfo';
 
     if (!!this.token) {
       return this.getRequestOptionsArgs()
         .switchMap(requestOptionsArgs => this.http.get(url, requestOptionsArgs))
-        .map(response => response.json())
-        .map(jsonIdentity => new Identity(jsonIdentity));
+        .map((jsonIdentity: JsonIdentity) => new Identity(jsonIdentity));
     } else {
       return Observable.of(null);
     }
   }
 
   clearIdentity(): Observable<any> {
-    return Observable.create((observer) => {
-      this.token = null;
+    return Observable.create((observer: Subscriber<any>) => {
+      this.cookieService.remove('token');
+      this._token = undefined;
       this.cookieService.remove('auth-redirect-url');
 
       if (!!this._isAuthenticated) {

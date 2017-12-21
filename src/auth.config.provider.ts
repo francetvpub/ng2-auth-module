@@ -6,6 +6,6 @@ export const FTP_DEFAULT_AUTH_CONFIG: FtpAuthConfig = {
   OpenIdClientId: '',
   OpenIdScope: '',
   OpenIdAuthorizeEndpoint: ''
-}
+};
 
 export const FTP_AUTH_CONFIG = new InjectionToken<FtpAuthConfig>('ftp-auth-config');

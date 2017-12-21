@@ -2,6 +2,9 @@
   "name": "@francetvpub/ng2-auth-module",
   "version": "0.0.1",
   "description": "France Télévision Publicité Authentication Module",
+  "scripts": {
+    "build": "webpack"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/francetvpub/ng2-auth-module.git"
@@ -12,10 +15,14 @@
     "url": "https://github.com/francetvpub/ng2-auth-module/issues"
   },
   "homepage": "https://github.com/francetvpub/ng2-auth-module#readme",
+  "main": "bundles/ftp-auth-module.umd.js",
+  "module": "index.js",
+  "typings": "index.d.ts",
   "peerDependencies": {
     "@angular/core": "^5.0.0",
     "@angular/common": "^5.0.0",
     "@angular/http": "^5.0.0",
+    "@angular/router": "^5.0.0",
     "@angular/material": "^5.0.0",
     "angular-moment": "^1.1.0",
     "moment": "^2.18.1",
@@ -23,5 +30,32 @@
   },
   "dependencies": {
     "tslib": "^1.7.1"
+  },
+  "devDependencies": {
+    "@angular/compiler": "^5.1.1",
+    "@angular/compiler-cli": "^5.1.1",
+    "@angular/core": "^5.0.0",
+    "@angular/common": "^5.0.0",
+    "@angular/http": "^5.0.0",
+    "@angular/router": "^5.0.0",
+    "@angular/material": "^5.0.0",
+    "angular-moment": "^1.1.0",
+    "moment": "^2.18.1",
+    "ngx-cookie": "^1.0.1",
+    "awesome-typescript-loader": "3.3.0",
+    "clean-webpack-plugin": "0.1.17",
+    "codelyzer": "^4.0.1",
+    "core-js": "2.5.1",
+    "loader-utils": "1.1.0",
+    "reflect-metadata": "0.1.10",
+    "rimraf": "2.6.2",
+    "rxjs": "^5.5.5",
+    "source-map-loader": "0.2.3",
+    "ts-helpers": "1.1.2",
+    "tslint": "5.8.0",
+    "tslint-loader": "3.5.3",
+    "typescript": "2.4.2",
+    "webpack": "3.8.1",
+    "zone.js": "0.8.18"
   }
 }
