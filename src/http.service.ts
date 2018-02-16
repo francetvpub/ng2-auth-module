@@ -26,4 +26,8 @@ export class FtpHttpService {
   public delete(url: string): Observable<Object> {
     return this.http.delete(url);
   }
+
+  public put(url: string, data: any): Observable<Object> {
+    return this.http.put(url, data);
+  }
 }
