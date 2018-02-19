@@ -20,10 +20,23 @@ export class FtpHttpService {
   }
 
   public post(url: string, data: any): Observable<Object> {
-    return this.http.post(url, data);
+    return this.authService.getRequestOptionsArgs()
+      .switchMap((requestOptionsArgs: {headers?: HttpHeaders | {
+        [header: string]: string | string[];
+      }}) => this.http.post(url, data, requestOptionsArgs));
   }
 
   public delete(url: string): Observable<Object> {
-    return this.http.delete(url);
+    return this.authService.getRequestOptionsArgs()
+      .switchMap((requestOptionsArgs: {headers?: HttpHeaders | {
+        [header: string]: string | string[];
+      }}) => this.http.delete(url, requestOptionsArgs));
+  }
+
+  public put(url: string, data: any): Observable<Object> {
+    return this.authService.getRequestOptionsArgs()
+      .switchMap((requestOptionsArgs: {headers?: HttpHeaders | {
+        [header: string]: string | string[];
+      }}) => this.http.put(url, data, requestOptionsArgs));
   }
 }
