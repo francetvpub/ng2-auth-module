@@ -12,35 +12,35 @@ export class FtpHttpService {
     private authService: FtpAuthService
   ) { }
 
-  public get(url: string): Observable<Object> {
+  public get(url: string): Observable<any> {
     return this.authService.getRequestOptionsArgs()
       .switchMap((requestOptionsArgs: {headers?: HttpHeaders | {
         [header: string]: string | string[];
       }}) => this.http.get(url, requestOptionsArgs));
   }
 
-  public post(url: string, data: any): Observable<Object> {
+  public post(url: string, data: any): Observable<any> {
     return this.authService.getRequestOptionsArgs()
       .switchMap((requestOptionsArgs: {headers?: HttpHeaders | {
         [header: string]: string | string[];
       }}) => this.http.post(url, data, requestOptionsArgs));
   }
 
-  public delete(url: string): Observable<Object> {
+  public delete(url: string): Observable<any> {
     return this.authService.getRequestOptionsArgs()
       .switchMap((requestOptionsArgs: {headers?: HttpHeaders | {
         [header: string]: string | string[];
       }}) => this.http.delete(url, requestOptionsArgs));
   }
 
-  public put(url: string, data: any): Observable<Object> {
+  public put(url: string, data: any): Observable<any> {
     return this.authService.getRequestOptionsArgs()
       .switchMap((requestOptionsArgs: {headers?: HttpHeaders | {
         [header: string]: string | string[];
       }}) => this.http.put(url, data, requestOptionsArgs));
   }
 
-  public patch(url: string, data: any): Observable<Object> {
+  public patch(url: string, data: any): Observable<any> {
     return this.authService.getRequestOptionsArgs()
       .switchMap((requestOptionsArgs: {headers?: HttpHeaders | {
         [header: string]: string | string[];
