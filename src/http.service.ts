@@ -39,4 +39,11 @@ export class FtpHttpService {
         [header: string]: string | string[];
       }}) => this.http.put(url, data, requestOptionsArgs));
   }
+
+  public patch(url: string, data: any): Observable<Object> {
+    return this.authService.getRequestOptionsArgs()
+      .switchMap((requestOptionsArgs: {headers?: HttpHeaders | {
+        [header: string]: string | string[];
+      }}) => this.http.patch(url, data, requestOptionsArgs));
+  }
 }
