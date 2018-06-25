@@ -17,6 +17,5 @@ export interface FtpRequestOptions {
     [param: string]: string | string[];
   };
   reportProgress?: boolean;
-  responseType?: 'json';
   withCredentials?: boolean;
 }
