@@ -1,6 +1,6 @@
 {
   "name": "ftp-ng2-auth-module",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "France Télévision Publicité Authentication Module",
   "scripts": {
     "prepublishOnly": "ngc && npm run build",
