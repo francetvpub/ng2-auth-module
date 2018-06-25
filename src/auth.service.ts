@@ -2,7 +2,7 @@ import {Inject, Injectable} from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {Router} from '@angular/router';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {FtpAuthConfig} from './auth.config';
+import {FtpAuthConfig, FtpRequestOptions} from './auth.config';
 import {FTP_AUTH_CONFIG} from './auth.config.provider';
 import {CookieService} from 'ngx-cookie';
 import 'rxjs/add/observable/of';
@@ -191,19 +191,18 @@ export class FtpAuthService {
     return this.refreshToken$[this.token.refreshToken];
   }
 
-  getRequestOptionsArgs(additionalHeaders?: HttpHeaders): Observable<{headers?: HttpHeaders | {
-    [header: string]: string | string[];
-  }}> {
-    return this.getHeaders(additionalHeaders)
+  getRequestOptionsArgs(requestOptions?: FtpRequestOptions): Observable<FtpRequestOptions> {
+    return this.getHeaders(requestOptions)
       .map((headers: HttpHeaders) => {
-        return {
+        return Object.assign({}, requestOptions, {
           headers: headers
-        };
+        });
       });
   }
 
-  getHeaders(additionalHeaders?: HttpHeaders): Observable<HttpHeaders> {
-    let headers = !!additionalHeaders ? additionalHeaders : new HttpHeaders();
+  getHeaders(requestOptions?: FtpRequestOptions): Observable<HttpHeaders> {
+    let headers = <HttpHeaders>((requestOptions && requestOptions['headers']) ?
+      requestOptions['headers'] : new HttpHeaders());
 
     if (!!this.token && this.token.isValid()) {
       headers = headers.append('Authorization', 'Bearer ' + this.token.accessToken);
