@@ -4,6 +4,7 @@ export interface JsonIdentity {
   given_name: string;
   family_name: string;
   groups: string;
+  profile: string;
 }
 
 export class Identity {
@@ -12,6 +13,7 @@ export class Identity {
   firstName: string;
   lastName: string;
   groups: string[];
+  profile: string;
 
   constructor(jsonIdentity: JsonIdentity) {
     this.login = jsonIdentity.sub;
@@ -19,5 +21,6 @@ export class Identity {
     this.firstName = jsonIdentity.given_name;
     this.lastName = jsonIdentity.family_name;
     this.groups = jsonIdentity.groups.split(',');
+    this.profile = jsonIdentity.profile;
   }
 }
