@@ -16,6 +16,7 @@ import {Identity, JsonIdentity} from './identity';
 import {Subject} from 'rxjs/Subject';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Subscriber} from 'rxjs/Subscriber';
+import { of } from 'rxjs/observable/of';
 
 export interface JsonOAuthToken {
   access_token: string;
@@ -173,7 +174,7 @@ export class FtpAuthService {
 
   refreshToken(): Observable<OAuthToken> {
     if (!this.token.refreshToken) {
-      return Observable.of(new OAuthToken());
+      return of(new OAuthToken());
     }
 
     if (!this.refreshToken$[this.token.refreshToken]) {
@@ -216,7 +217,7 @@ export class FtpAuthService {
         });
     }
 
-    return Observable.of(headers);
+    return of(headers);
   }
 
   getIdentity(): Observable<Identity>|Observable<null> {
@@ -227,7 +228,7 @@ export class FtpAuthService {
         .switchMap(requestOptionsArgs => this.http.get(url, requestOptionsArgs))
         .map((jsonIdentity: JsonIdentity) => new Identity(jsonIdentity));
     } else {
-      return Observable.of(null);
+      return of(null);
     }
   }
 
