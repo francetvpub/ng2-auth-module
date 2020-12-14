@@ -133,11 +133,11 @@ export class FtpAuthService {
   }
 
   authenticate(authorizationCode: string): Observable<boolean> {
-    let url = this.config.ApiBaseUrl + '/oauth';
+    let url = this.config.ApiBaseUrl + '/oauth/token';
 
     const params = new URLSearchParams();
     params.set('redirect_uri', this.callbackUrl);
-    params.set('response_type', 'code');
+    params.set('grant_type', 'authorization_code');
     params.set('client_id', this.config.OpenIdClientId);
     params.set('code', authorizationCode);
     if (!!this.config.OpenIdClientSecret) {
